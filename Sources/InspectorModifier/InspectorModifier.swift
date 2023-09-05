@@ -19,18 +19,22 @@ extension InspectorViewModifier {
 
 extension InspectorViewModifier {
     public func body(content: Content) -> some View {
-        HStack(spacing: 0) {
-            content
+        Group {
+            GeometryReader { geometry in
+                HStack(spacing: 0) {
+                    content
+                        .frame(width: isPresented ? nil : geometry.size.width)
 
-            divider
+                    divider
 
-            Group {
-                let newWidth = width - translation
-                inspectorContent()
-                    //.offset(x: isPresented ? 0 : newWidth)
-                    .frame(width: isPresented ? max(0, newWidth) : 0)
-                    //.frame(width: max(0, newWidth))
+                    Group {
+                        let newWidth = width - translation
+                        inspectorContent()
 
+                            .offset(x: isPresented ? 0 : newWidth)
+                            .frame(width: max(0, newWidth))
+                    }
+                }
             }
         }
         .onPreferenceChange(InspectorColumnWidthPreference.self) { value in
@@ -75,7 +79,7 @@ extension InspectorViewModifier {
         }
     }
 
-    func onDividerDragEnded(_ value: DragGesture.Value) {
+    func onDividerDragEnded(_: DragGesture.Value) {
         width = width - translation
         translation = 0
     }

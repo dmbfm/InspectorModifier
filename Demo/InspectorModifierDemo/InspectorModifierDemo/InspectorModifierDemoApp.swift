@@ -11,7 +11,8 @@ import SwiftUI
 struct InspectorModifierDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView()         
         }
+        
     }
 }

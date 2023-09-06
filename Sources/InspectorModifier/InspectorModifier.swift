@@ -8,6 +8,7 @@ public struct InspectorViewModifier<V: View>: ViewModifier {
     @State private var sizePreference = InspectorColumnWidthValue.default
     @State var width: CGFloat = 0
     @State var translation: CGFloat = 0
+    @State var divierIgnoresSafeArea = false
 }
 
 extension InspectorViewModifier {
@@ -25,17 +26,22 @@ extension InspectorViewModifier {
                     content
                         .frame(width: isPresented ? nil : geometry.size.width)
 
-                    divider
+                    if divierIgnoresSafeArea {
+                        divider.ignoresSafeArea()
+                    } else {
+                        divider
+                    }
 
                     Group {
                         let newWidth = width - translation
                         inspectorContent()
-
-                            .offset(x: isPresented ? 0 : newWidth)
                             .frame(width: max(0, newWidth))
                     }
                 }
             }
+        }
+        .onPreferenceChange(DividerIgnoresSafeArea.self) { value in
+            divierIgnoresSafeArea = value
         }
         .onPreferenceChange(InspectorColumnWidthPreference.self) { value in
             sizePreference = value
@@ -45,9 +51,15 @@ extension InspectorViewModifier {
             width = sizePreference.ideal
         }
     }
+    
+    #if canImport(AppKit)
+    var dividerColor: Color { Color(nsColor: NSColor.separatorColor) }
+    #else
+    var dividerColor: Color { Color(uiColor: UIColor.separator) }
+    #endif
 
     var divider: some View {
-        Color(nsColor: NSColor.separatorColor)
+       dividerColor
             .frame(width: isPresented ? 2 : 0)
             .gesture(DragGesture(coordinateSpace: .global)
                 .onChanged(self.onDividerDrag)
@@ -114,6 +126,19 @@ public extension View {
 
     func inspectorColumnWidth(min: CGFloat?, ideal: CGFloat, max: CGFloat?) -> some View {
         preference(key: InspectorColumnWidthPreference.self, value: InspectorColumnWidthValue(ideal: ideal, min: min, max: max))
+    }
+}
+
+struct DividerIgnoresSafeArea: PreferenceKey {
+    static var defaultValue = false
+    static func reduce(value: inout Bool, nextValue: () -> Bool) {
+        value = nextValue()
+    }
+}
+
+public extension View {
+    func inspectorDividerIgnoresSafeArea() -> some View {
+        preference(key: DividerIgnoresSafeArea.self, value: true)
     }
 }
 

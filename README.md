@@ -20,7 +20,7 @@ struct ContentView: View {
         }.inspector(isPresented: $isPresented) {
             Text("Inspector")
                 .inspectorColumnWidth(min: 50, ideal: 200, max: 300)
-                #if os(iOS)
+                #if os(iOS) // You may need this on iPad
                 .inspectorDividerIgnoresSafeArea()
                 #endif
         }

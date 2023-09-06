@@ -42,9 +42,11 @@ extension InspectorViewModifier {
         Group {
             GeometryReader { geometry in
                 HStack(spacing: 0) {
-                    content
-                        .frame(width: isPresented ? nil : geometry.size.width)
-                        
+                    
+                    ZStack(alignment: .topLeading) {
+                        Color.clear
+                        content
+                    }.frame(width: isPresented ? nil : geometry.size.width)
                         
                         if divierIgnoresSafeArea {
                             divider.ignoresSafeArea()

@@ -16,6 +16,26 @@ enum NavigationItem: String {
 }
 
 struct ContentView: View {
+    @State var isPresented = false
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Main View")
+            Button("Toggle Inspector") {
+                isPresented.toggle()
+            }
+        }
+        .inspector($isPresented) {
+            Text("Inspector")
+                .inspectorColumnWidth(min: 50, ideal: 200, max: 300)
+#if os(iOS) // You may need this on iPad
+                .inspectorDividerIgnoresSafeArea()
+#endif
+        }
+    }
+}
+
+ struct ContentView: View {
     @State private var navItem: NavigationItem? = .all
     @State private var selectedCharacter: UUID?
     @State private var showInspector = false
@@ -34,7 +54,7 @@ struct ContentView: View {
                 return []
         }
     }
-    
+
     var selectedCharacterData: Character? {
         Character.allCharacters.first(where: { $0.id == selectedCharacter })
     }
@@ -44,14 +64,14 @@ struct ContentView: View {
                 List(selection: $navItem) {
                     Label("All Characters", systemImage: "house")
                         .tag(NavigationItem.all)
-                    
+
                     Section("By Genre") {
                         Label("Mystery", systemImage: "magnifyingglass")
                             .tag(NavigationItem.mystery)
-                        
+
                         Label("Fantasy", systemImage: "mountain.2.fill")
                             .tag(NavigationItem.fantasy)
-                        
+
                         Label("Science Fiction", systemImage: "airpods.chargingcase.fill")
                             .tag(NavigationItem.scifi)
                     }
@@ -63,14 +83,14 @@ struct ContentView: View {
                     Button{
                     showInspector.toggle()
                     } label: { Image(systemName: "info.circle")}
-                    
+
                 }
             }
             #endif
         } detail: {
-                
+
                 //Color.teal.opacity(0.25)
-                
+
                 List(selection: $selectedCharacter) {
                     ForEach(visibleItems) { item in
                         Text(item.name)
@@ -124,7 +144,7 @@ struct ContentView: View {
         }
         #endif
     }
-    
+
     @ViewBuilder
     func characterDetailView(_ char: Character) -> some View {
         VStack(alignment: .leading) {
@@ -132,14 +152,14 @@ struct ContentView: View {
                 .font(.largeTitle)
                 .fontDesign(.rounded)
                 .padding(.vertical)
-            
+
             Text(char.description)
                 .multilineTextAlignment(.leading)
-            
+
             Spacer()
         }.padding()
     }
-}
+ }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

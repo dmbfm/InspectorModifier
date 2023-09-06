@@ -8,16 +8,16 @@ use. On iPad it is janky but works. On iPhone it does not currently work well.
 
 ```swift 
 struct ContentView: View {
-
     @State var isPresented = false
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             Text("Main View")
             Button("Toggle Inspector") {
-                isPresented.toggle()            
+                isPresented.toggle()
             }
-        }.inspector(isPresented: $isPresented) {
+        }
+        .inspector($isPresented) {
             Text("Inspector")
                 .inspectorColumnWidth(min: 50, ideal: 200, max: 300)
                 #if os(iOS) // You may need this on iPad

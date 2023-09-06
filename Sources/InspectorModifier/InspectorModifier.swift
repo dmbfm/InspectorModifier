@@ -19,24 +19,52 @@ extension InspectorViewModifier {
 }
 
 extension InspectorViewModifier {
+    
+    var invisibleDivider: some View {
+        Color.clear
+            .contentShape(Rectangle())
+            .frame(width: 12)
+            .gesture(DragGesture(coordinateSpace: .global)
+                .onChanged(self.onDividerDrag)
+                .onEnded(self.onDividerDragEnded))
+#if os(macOS)
+            .onHover { value in
+                if value {
+                    NSCursor.resizeLeftRight.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
+#endif
+    }
+    
     public func body(content: Content) -> some View {
         Group {
             GeometryReader { geometry in
                 HStack(spacing: 0) {
                     content
                         .frame(width: isPresented ? nil : geometry.size.width)
-
-                    if divierIgnoresSafeArea {
-                        divider.ignoresSafeArea()
-                    } else {
-                        divider
-                    }
-
-                    Group {
-                        let newWidth = width - translation
-                        inspectorContent()
-                            .frame(width: max(0, newWidth))
-                    }
+                        
+                        
+                        if divierIgnoresSafeArea {
+                            divider.ignoresSafeArea()
+                        } else {
+                            divider
+                        }
+                    
+                        
+                        Group {
+                            ZStack(alignment: .topLeading) {
+                                
+                                invisibleDivider
+                                    .zIndex(1)
+                                
+                                let newWidth = width - translation
+                                inspectorContent()
+                                    .frame(width: max(0, newWidth))
+                            }
+                        }
+                    
                 }
             }
         }
@@ -60,19 +88,8 @@ extension InspectorViewModifier {
 
     var divider: some View {
        dividerColor
-            .frame(width: isPresented ? 2 : 0)
-            .gesture(DragGesture(coordinateSpace: .global)
-                .onChanged(self.onDividerDrag)
-                .onEnded(self.onDividerDragEnded))
-        #if os(macOS)
-            .onHover { value in
-                if value {
-                    NSCursor.resizeLeftRight.push()
-                } else {
-                    NSCursor.pop()
-                }
-            }
-        #endif
+            .frame(width: isPresented ? 1 : 0)
+            
     }
 }
 
